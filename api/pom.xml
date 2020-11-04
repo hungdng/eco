@@ -16,6 +16,7 @@
     </properties>
 
     <dependencies>
+        <!-- Project modules -->
         <dependency>
             <groupId>com.hung</groupId>
             <artifactId>common</artifactId>
@@ -26,10 +27,13 @@
             <artifactId>data</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
