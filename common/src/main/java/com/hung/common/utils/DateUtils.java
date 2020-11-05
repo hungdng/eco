@@ -153,6 +153,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return result;
     }
 
+    /**
+     * convert LocalDateTime object to String.
+     *
+     * @param target
+     *            value
+     * @param pattern
+     *            date time pattern
+     * @return string
+     */
+    public static String convertDateToString(final LocalDateTime target, final DateTimeFormat pattern) {
+        DateTimeFormatter dateTimeFormatter = getDateTimeFormatter(pattern);
+        String result;
+        try {
+            result = target.format(dateTimeFormatter);
+        } catch (final DateTimeException e) {
+            throw new SystemException(e);
+        }
+
+        return result;
+    }
+
     private static DateTimeFormatter getDateTimeFormatter(DateTimeFormat pattern) {
         if (pattern == null) throw new SystemException("");
 
@@ -206,8 +227,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      *            date time pattern
      * @return string
      */
-    public static LocalDateTime convertStringToDateTime(final String target, final DateTimeFormat pattern) {
-        LocalDateTime localDate;
+    public static LocalDateTime convertStringToLocalDateTime(final String target,
+                                                     final DateTimeFormat pattern) {
+        LocalDateTime localDateTime;
         if (pattern == null) {
             throw new SystemException("");
         }
@@ -220,13 +242,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         }
 
         try {
-            localDate = LocalDateTime.parse(target, dateTimeFormatter);
+            localDateTime = LocalDateTime.parse(target, dateTimeFormatter);
         } catch (final DateTimeParseException e) {
             throw new SystemException(e);
         }
 
-        return localDate;
+        return localDateTime;
     }
+
 
     /**
      * convert String to java.util.Date

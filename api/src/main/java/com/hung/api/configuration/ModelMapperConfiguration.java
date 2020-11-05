@@ -22,11 +22,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 @Configuration
 public class ModelMapperConfiguration {
+
     /**
      * Custom ModelMapper process
      *
@@ -37,10 +39,12 @@ public class ModelMapperConfiguration {
         final ModelMapper modelMapper = new ModelMapper();
         final List<ConditionalConverter<?, ?>> converters = modelMapper.getConfiguration().getConverters();
 
-        modelMapper.addConverter(convertStringToLocalDate());
-        modelMapper.addConverter(convertLocalDateToString());
-        modelMapper.addConverter(convertStringToTimeStamp());
-        modelMapper.addConverter(convertTimeStampToString());
+//        modelMapper.addConverter(convertStringToLocalDate());
+//        modelMapper.addConverter(convertLocalDateToString());
+//        modelMapper.addConverter(convertStringToLocalDateTime());
+//        modelMapper.addConverter(convertLocalDateTimeToString());
+//        modelMapper.addConverter(convertStringToTimeStamp());
+//        modelMapper.addConverter(convertTimeStampToString());
         modelMapper.addConverter(trimString());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         converters.add(0, objectToEnumConverter());
@@ -55,12 +59,12 @@ public class ModelMapperConfiguration {
      */
     private AbstractConverter<String, LocalDate> convertStringToLocalDate() {
 
-        return new AbstractConverter<String, LocalDate>() {
+        return new AbstractConverter<>() {
 
             @Override
             protected LocalDate convert(final String source) {
 
-                if(StringUtils.isEmpty(source)) {
+                if (StringUtils.isEmpty(source)) {
                     return null;
                 }
                 return DateUtils.convertStringToLocalDate(source, DateTimeFormat.SLASH_YYYYMMDD);
@@ -79,6 +83,42 @@ public class ModelMapperConfiguration {
             @Override
             protected String convert(final LocalDate source) {
                 return DateUtils.convertDateToString(source, DateTimeFormat.SLASH_YYYYMMDD);
+            }
+        };
+    }
+
+    /**
+     * String to LocalDateTime Converter
+     *
+     * @return AbstractConverter
+     */
+    private AbstractConverter<String, LocalDateTime> convertStringToLocalDateTime() {
+
+        return new AbstractConverter<>() {
+
+            @Override
+            protected LocalDateTime convert(final String source) {
+
+                if (StringUtils.isEmpty(source)) {
+                    return null;
+                }
+                return DateUtils.convertStringToLocalDateTime(source, DateTimeFormat.SLASH_YYYY_MM_DD_HH_MM_SS);
+            }
+        };
+    }
+
+    /**
+     * LocalDateTime to String Converter
+     *
+     * @return AbstractConverter
+     */
+    private AbstractConverter<LocalDateTime, String> convertLocalDateTimeToString() {
+        System.out.println("convertLocalDateTimeToString");
+        return new AbstractConverter<LocalDateTime, String>() {
+
+            @Override
+            protected String convert(final LocalDateTime source) {
+                return DateUtils.convertDateToString(source, DateTimeFormat.SLASH_YYYY_MM_DD_HH_MM_SS);
             }
         };
     }

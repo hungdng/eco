@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 @Component
 public class DateSupport {
 
-//    @Autowired
+    @Autowired
     private Supplier<Instant> supplier;
 
     /**
