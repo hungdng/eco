@@ -16,6 +16,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ResponseStatus implements CodeEnum {
+    FAILED("500", "Error"),
+    UNAUTHORIZED("401", "UnAuthorized"),
+    FORBIDDEN("403", "Forbidden"),
     SUCCESS("0","Success"),
     ERROR("1000","error"),
     VALIDATION_ERROR("2000","Validerror"),

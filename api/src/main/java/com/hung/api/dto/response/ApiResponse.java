@@ -22,7 +22,7 @@ import java.util.List;
 public class ApiResponse<T> {
     private String timestamp;
 
-    @JsonProperty("status_code")
+    @JsonProperty("code")
     private ResponseStatus statusCode;
     private String message;
     private T data;

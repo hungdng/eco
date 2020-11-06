@@ -10,14 +10,13 @@ package com.hung.api.component.support;
 
 import com.hung.api.dto.response.ApiResponse;
 import com.hung.api.dto.response.common.PartError;
-import com.hung.common.enums.DateTimeFormat;
 import com.hung.common.enums.ResponseStatus;
-import com.hung.common.utils.DateUtils;
 import com.hung.data.enums.MessageCode;
-import com.hung.data.support.DateSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -29,11 +28,22 @@ public class ResponseSupport {
     private static final String VALIDATION_MESSAGE = ResponseStatus.VALIDATION_ERROR.getName();
 
     @Autowired
-    private DateSupport dateSupport;
-
-    @Autowired
     @Qualifier("validationMessageSource")
     private MessageSource messageSource;
+
+    /**
+     * return success with data.
+     *
+     * @return response object
+     *
+     */
+    public ResponseEntity<?> create(Object data){
+        return ResponseEntity.created(null).body(
+                response(ResponseStatus.SUCCESS,
+                        messageSource.getMessage(MessageCode.SUCCESS_CREATE.getValue(),null,Locale.getDefault()),
+                        data,
+                        null));
+    }
 
     /**
      * return success with data.
@@ -42,10 +52,84 @@ public class ResponseSupport {
      * @param messageCode
      * @return response object
      */
-    public ApiResponse<?> fetchSuccess(final Object data , MessageCode messageCode){
-        return fetchNormal(ResponseStatus.SUCCESS,messageCode, data);
+    public ResponseEntity<?> success(final Object data , final MessageCode messageCode){
+        return fetchNormal(ResponseStatus.SUCCESS, messageCode, data);
     }
 
+    /**
+     * return success with message, without data.
+     *
+     * @param messageCode messageCode
+     * @return response object
+     */
+    public ResponseEntity<?> success(final MessageCode messageCode){
+        return fetchNormal(ResponseStatus.SUCCESS, messageCode, null);
+    }
+
+    /**
+     * return empty data.
+     *
+     * @param messageCode messageCode of response
+     * @return response object
+     */
+    public ResponseEntity<?> empty(final MessageCode messageCode){
+        return fetchNormal(ResponseStatus.SUCCESS, messageCode, null);
+    }
+
+    /**
+     * return failure with message code enum.
+     *
+     * @param statusCode status of response
+     * @param messageCode messageCode of response
+     * @return response object
+     */
+    public ResponseEntity<?> error(final ResponseStatus statusCode, final MessageCode messageCode){
+        String message = messageSource.getMessage(messageCode.getValue(),null, Locale.getDefault());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(response(statusCode, message, null, null));
+    }
+
+    /**
+     * return failure with message string.
+     *
+     * @param statusCode status of response
+     * @param message messageCode of response
+     * @return response object
+     */
+    public ApiResponse<?> error(final ResponseStatus statusCode,
+                                     final String message){
+        return response(statusCode, message,
+                null,
+                null);
+    }
+
+    /**
+     * return failure
+     *
+     * @param errors error list
+     * @param errors object
+     * @return
+     */
+    public ResponseEntity<?> error(final List<PartError>errors){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response(ResponseStatus.VALIDATION_ERROR, VALIDATION_MESSAGE, null, errors));
+    }
+
+    /**
+     * return success with status code,message and data.
+     *
+     * @param data response data
+     * @param messageCode messageCode of response
+     * @return response object
+     */
+    public ApiResponse<?> error(final Object data,
+                                     final MessageCode messageCode){
+        String message = messageSource.getMessage(messageCode.getValue(), null,Locale.getDefault());
+        return response(ResponseStatus.ERROR, message, data, null);
+    }
+    
     /**
      * return success.
      *
@@ -54,12 +138,11 @@ public class ResponseSupport {
      * @param data response data
      * @return response object
      */
-    public ApiResponse<?> fetchNormal(final ResponseStatus code,
+    public ResponseEntity<?> fetchNormal(final ResponseStatus code,
                                       final MessageCode messageCode,
                                       final Object data){
-
         String message = messageSource.getMessage(messageCode.getValue(), null, Locale.getDefault());
-        return response(code,message,data,null);
+        return ResponseEntity.ok(response(code,message,data,null));
     }
 
     /**
@@ -76,10 +159,6 @@ public class ResponseSupport {
                                     final Object data,
                                     final List<PartError> errors){
         return ApiResponse.builder()
-                .timestamp(
-                        DateUtils.convertDateTimeToString(
-                                dateSupport.getLocalDateTime(),
-                                DateTimeFormat.SLASH_YYYY_MM_DD_HH_MM_SS))
                 .statusCode(code)
                 .message(message)
                 .data(data)

@@ -11,6 +11,7 @@ package com.hung.api.contrller;
 import com.hung.api.component.support.ResponseSupport;
 import com.hung.api.dto.request.category.RequestCaregoryCreate;
 import com.hung.api.dto.response.ApiResponse;
+import com.hung.api.dto.response.ResponseData;
 import com.hung.api.dto.response.category.ResponseCategory;
 import com.hung.data.entity.ProductCategory;
 import com.hung.data.enums.MessageCode;
@@ -19,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,21 +41,21 @@ public class CategoryController {
     private ResponseSupport responseSupport;
 
     @GetMapping
-    public ApiResponse<?> findAll(){
+    public ResponseEntity<?> findAll(){
         final List<ProductCategory> categories = categoryService.findAll();
 
         final Type categoryListType = new TypeToken<List<ResponseCategory>>() {
         }.getType();
 
         final List<ResponseCategory> categoryList = modelMapper.map(categories, categoryListType);
-        return responseSupport.fetchSuccess(categoryList, MessageCode.SUCCESS_GET_DATA);
+        return responseSupport.success(categoryList, MessageCode.SUCCESS_GET_DATA);
     }
 
     @PostMapping
-    public ApiResponse<?> create(@Valid @RequestBody final RequestCaregoryCreate requestCaregoryCreate){
+    public ResponseEntity<?> create(@Valid @RequestBody final RequestCaregoryCreate requestCaregoryCreate){
         final ProductCategory category = modelMapper.map(requestCaregoryCreate, ProductCategory.class);
         var categoryDb = categoryService.save(category);
         final ResponseCategory responseCategory = modelMapper.map(categoryDb, ResponseCategory.class);
-        return ResponseEntity.ok(responseCategory);
+        return responseSupport.create(responseCategory);
     }
 }
