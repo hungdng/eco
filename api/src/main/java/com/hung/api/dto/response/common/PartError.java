@@ -10,9 +10,11 @@ package com.hung.api.dto.response.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @JsonPropertyOrder({"error_item","error_code","error_message"})
 public class PartError {
     @JsonProperty("error_code")

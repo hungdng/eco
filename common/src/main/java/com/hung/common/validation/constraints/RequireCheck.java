@@ -8,7 +8,11 @@
  **/
 package com.hung.common.validation.constraints;
 
+import com.hung.common.annotation.ErrorCode;
+import com.hung.common.validation.RequireCheckValidator;
+
 import javax.validation.Constraint;
+import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -21,8 +25,16 @@ import java.lang.annotation.Target;
 @Target({FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = )
+@Constraint(validatedBy = RequireCheckValidator.class)
+@ErrorCode("2001")
 public @interface RequireCheck {
 
+    /** messsage */
     String message() default "{requirecheck}";
+
+    /** */
+    Class<?>[] groups() default { };
+
+    /** */
+    Class<? extends Payload>[] payload() default { };
 }

@@ -8,6 +8,7 @@
  **/
 package com.hung.api.dto.request.category;
 
+import com.hung.common.validation.constraints.RequireCheck;
 import com.hung.data.enums.StatusEnum;
 import lombok.Data;
 
@@ -17,7 +18,8 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class RequestCaregoryCreate {
 
-    @NotEmpty(message = "Name is mandatory")
+    @RequireCheck
+    @NotBlank(message = "Name is mandatory")
     private String name;
 
 //    @NotBlank(message = "Status is mandatory")
