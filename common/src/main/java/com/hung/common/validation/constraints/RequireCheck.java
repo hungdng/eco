@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = RequireCheckValidator.class)
-@ErrorCode("2001")
 public @interface RequireCheck {
 
     /** messsage */

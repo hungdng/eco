@@ -10,7 +10,6 @@ spring:
     console:
       enabled: true
   jackson:
-#    date-format: yyyy/MM/dd
     default-property-inclusion: non_null      # com.fasterxml.jackson.annotation.JsonInclude.Include
     deserialization:                          # com.fasterxml.jackson.databind.DeserializationFeature
       FAIL_ON_UNKNOWN_PROPERTIES : false

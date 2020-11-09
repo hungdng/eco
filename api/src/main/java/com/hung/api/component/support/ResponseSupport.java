@@ -10,7 +10,7 @@ package com.hung.api.component.support;
 
 import com.hung.api.dto.response.ApiResponse;
 import com.hung.api.dto.response.common.PartError;
-import com.hung.common.enums.ResponseStatus;
+import com.hung.common.enums.ECOResponseStatus;
 import com.hung.data.enums.MessageCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +24,8 @@ import java.util.Locale;
 
 @Component
 public class ResponseSupport {
-    private static final String SUCCESS_MESSAGE = ResponseStatus.SUCCESS.getName();
-    private static final String VALIDATION_MESSAGE = ResponseStatus.VALIDATION_ERROR.getName();
+    private static final String SUCCESS_MESSAGE = ECOResponseStatus.SUCCESS.getName();
+    private static final String VALIDATION_MESSAGE = ECOResponseStatus.VALIDATION_ERROR.getName();
 
     @Autowired
     @Qualifier("validationMessageSource")
@@ -39,7 +39,7 @@ public class ResponseSupport {
      */
     public ResponseEntity<?> create(Object data){
         return ResponseEntity.created(null).body(
-                response(ResponseStatus.SUCCESS,
+                response(ECOResponseStatus.SUCCESS,
                         messageSource.getMessage(MessageCode.SUCCESS_CREATE.getValue(),null,Locale.getDefault()),
                         data,
                         null));
@@ -53,7 +53,7 @@ public class ResponseSupport {
      * @return response object
      */
     public ResponseEntity<?> success(final Object data , final MessageCode messageCode){
-        return fetchNormal(ResponseStatus.SUCCESS, messageCode, data);
+        return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, data);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ResponseSupport {
      * @return response object
      */
     public ResponseEntity<?> success(final MessageCode messageCode){
-        return fetchNormal(ResponseStatus.SUCCESS, messageCode, null);
+        return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, null);
     }
 
     /**
@@ -73,7 +73,7 @@ public class ResponseSupport {
      * @return response object
      */
     public ResponseEntity<?> empty(final MessageCode messageCode){
-        return fetchNormal(ResponseStatus.SUCCESS, messageCode, null);
+        return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, null);
     }
 
     /**
@@ -83,7 +83,7 @@ public class ResponseSupport {
      * @param messageCode messageCode of response
      * @return response object
      */
-    public ResponseEntity<?> error(final ResponseStatus statusCode, final MessageCode messageCode){
+    public ResponseEntity<?> error(final ECOResponseStatus statusCode, final MessageCode messageCode){
         String message = messageSource.getMessage(messageCode.getValue(),null, Locale.getDefault());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -97,7 +97,7 @@ public class ResponseSupport {
      * @param message messageCode of response
      * @return response object
      */
-    public ApiResponse<?> error(final ResponseStatus statusCode,
+    public ApiResponse<?> error(final ECOResponseStatus statusCode,
                                      final String message){
         return response(statusCode, message,
                 null,
@@ -111,10 +111,11 @@ public class ResponseSupport {
      * @param errors object
      * @return
      */
-    public ResponseEntity<?> error(final List<PartError>errors){
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response(ResponseStatus.VALIDATION_ERROR, VALIDATION_MESSAGE, null, errors));
+    public ApiResponse<?> error(final List<PartError>errors){
+        return response(ECOResponseStatus.VALIDATION_ERROR,
+                VALIDATION_MESSAGE,
+                null,
+                errors);
     }
 
     /**
@@ -127,7 +128,7 @@ public class ResponseSupport {
     public ApiResponse<?> error(final Object data,
                                      final MessageCode messageCode){
         String message = messageSource.getMessage(messageCode.getValue(), null,Locale.getDefault());
-        return response(ResponseStatus.ERROR, message, data, null);
+        return response(ECOResponseStatus.ERROR, message, data, null);
     }
     
     /**
@@ -138,7 +139,7 @@ public class ResponseSupport {
      * @param data response data
      * @return response object
      */
-    public ResponseEntity<?> fetchNormal(final ResponseStatus code,
+    public ResponseEntity<?> fetchNormal(final ECOResponseStatus code,
                                       final MessageCode messageCode,
                                       final Object data){
         String message = messageSource.getMessage(messageCode.getValue(), null, Locale.getDefault());
@@ -154,7 +155,7 @@ public class ResponseSupport {
      * @return response object
      *
      */
-    private ApiResponse<?> response(final ResponseStatus code,
+    private ApiResponse<?> response(final ECOResponseStatus code,
                                     final String message,
                                     final Object data,
                                     final List<PartError> errors){

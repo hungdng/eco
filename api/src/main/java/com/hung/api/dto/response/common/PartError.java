@@ -15,14 +15,11 @@ import lombok.Data;
 
 @Data
 @Builder
-@JsonPropertyOrder({"error_item","error_code","error_message"})
+@JsonPropertyOrder({"item","message"})
 public class PartError {
-    @JsonProperty("error_code")
-    private String errorCode;
 
-    @JsonProperty("error_item")
+    @JsonProperty("item")
     private String errorItem;
 
-    @JsonProperty("error_message")
     private String message;
 }

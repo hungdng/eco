@@ -11,40 +11,34 @@ package com.hung.api.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.hung.api.dto.response.common.PartError;
-import com.hung.common.enums.ResponseStatus;
+import com.hung.common.enums.ECOResponseStatus;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@JsonPropertyOrder({"timestamp","statusCode","message","data","validation_error"})
+@JsonPropertyOrder({"statusCode","message","data","validationError"})
 public class ApiResponse<T> {
-    private String timestamp;
-
     @JsonProperty("code")
-    private ResponseStatus statusCode;
+    private ECOResponseStatus statusCode;
     private String message;
     private T data;
 
-    @JsonProperty("validation_error")
     private List<PartError> errors;
 
     /**
      *
-     * @param timestamp
      * @param statusCode
      * @param message
      * @param data
      * @param errors
      */
     @Builder
-    public ApiResponse(final String timestamp,
-                       final ResponseStatus statusCode,
+    public ApiResponse(final ECOResponseStatus statusCode,
                        final String message,
                        final T data,
                        final List<PartError> errors) {
-        this.timestamp = timestamp;
         this.statusCode = statusCode;
         this.message = message;
         this.data = data;

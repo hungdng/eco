@@ -54,7 +54,20 @@ public class ValidationSupport {
      * @return true if target is blank
      */
     public boolean isBlank(final String target){
-        return com.hung.common.utils.StringUtils.isBlank(target);
+        return StringUtils.isBlank(target);
+    }
+
+    /**
+     * check maximum character.
+     *
+     * @param target
+     *            value
+     * @param max
+     *            max length
+     * @return true if length of target is equal or smaller specify length
+     */
+    public boolean checkMax(final String target, final long max) {
+        return (StringUtils.length(target) <= max);
     }
 
 

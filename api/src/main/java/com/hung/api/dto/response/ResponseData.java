@@ -8,7 +8,7 @@
  **/
 package com.hung.api.dto.response;
 
-import com.hung.common.enums.ResponseStatus;
+import com.hung.common.enums.ECOResponseStatus;
 import com.hung.data.enums.CodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> success() {
-        return new ResponseData<T>(ResponseStatus.SUCCESS.getValue(), ResponseStatus.SUCCESS.getName(), null);
+        return new ResponseData<T>(ECOResponseStatus.SUCCESS.getValue(), ECOResponseStatus.SUCCESS.getName(), null);
     }
 
     /**
@@ -38,7 +38,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> success(T data) {
-        return new ResponseData<T>(ResponseStatus.SUCCESS.getValue(), ResponseStatus.SUCCESS.getName(), data);
+        return new ResponseData<T>(ECOResponseStatus.SUCCESS.getValue(), ECOResponseStatus.SUCCESS.getName(), data);
     }
 
     /**
@@ -49,7 +49,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> success(T data, String message) {
-        return new ResponseData<T>(ResponseStatus.SUCCESS.getValue(), message, data);
+        return new ResponseData<T>(ECOResponseStatus.SUCCESS.getValue(), message, data);
     }
 
     /**
@@ -80,7 +80,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> failed(String message) {
-        return new ResponseData<T>(ResponseStatus.FAILED.getValue(), message, null);
+        return new ResponseData<T>(ECOResponseStatus.FAILED.getValue(), message, null);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> failed() {
-        return failed(ResponseStatus.FAILED);
+        return failed(ECOResponseStatus.FAILED);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> validateFailed() {
-        return failed(ResponseStatus.VALIDATION_ERROR);
+        return failed(ECOResponseStatus.VALIDATION_ERROR);
     }
 
     /**
@@ -108,7 +108,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> validateFailed(String message) {
-        return new ResponseData<T>(ResponseStatus.VALIDATION_ERROR.getValue(), message, null);
+        return new ResponseData<T>(ECOResponseStatus.VALIDATION_ERROR.getValue(), message, null);
     }
 
     /**
@@ -118,7 +118,7 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> unauthorized(T data) {
-        return new ResponseData<T>(ResponseStatus.UNAUTHORIZED.getValue(), ResponseStatus.UNAUTHORIZED.getName(), data);
+        return new ResponseData<T>(ECOResponseStatus.UNAUTHORIZED.getValue(), ECOResponseStatus.UNAUTHORIZED.getName(), data);
     }
 
     /**
@@ -128,6 +128,6 @@ public class ResponseData<T> {
      * @return
      */
     public static <T> ResponseData<T> forbidden(T data) {
-        return new ResponseData<T>(ResponseStatus.FORBIDDEN.getValue(), ResponseStatus.FORBIDDEN.getName(), data);
+        return new ResponseData<T>(ECOResponseStatus.FORBIDDEN.getValue(), ECOResponseStatus.FORBIDDEN.getName(), data);
     }
 }

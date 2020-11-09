@@ -15,7 +15,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum ResponseStatus implements CodeEnum {
+public enum ECOResponseStatus implements CodeEnum {
     FAILED("500", "Error"),
     UNAUTHORIZED("401", "UnAuthorized"),
     FORBIDDEN("403", "Forbidden"),

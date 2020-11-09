@@ -8,18 +8,21 @@
  **/
 package com.hung.api.dto.request.category;
 
+import com.hung.common.validation.constraints.MaxLengthCheck;
 import com.hung.common.validation.constraints.RequireCheck;
 import com.hung.data.enums.StatusEnum;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class RequestCaregoryCreate {
 
     @RequireCheck
-    @NotBlank(message = "Name is mandatory")
+    @MaxLengthCheck(max = 3)
     private String name;
 
 //    @NotBlank(message = "Status is mandatory")

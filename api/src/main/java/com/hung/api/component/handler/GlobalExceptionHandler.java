@@ -13,7 +13,9 @@ import com.hung.api.component.support.ResponseSupport;
 import com.hung.api.dto.response.common.PartError;
 import com.hung.common.annotation.ErrorCode;
 import com.hung.common.annotation.FieldName;
-import com.hung.common.enums.ResponseStatus;
+import com.hung.common.enums.ECOResponseStatus;
+import com.hung.common.exceptions.BusinessException;
+import com.hung.common.exceptions.NotFoundException;
 import com.hung.common.exceptions.SystemException;
 import com.hung.common.utils.StringUtils;
 import com.hung.data.enums.MessageCode;
@@ -29,16 +31,18 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.lang.reflect.Field;
@@ -49,7 +53,7 @@ import java.util.*;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String DOT_CHARACTER = ".";
 
-    private static final String BUSINESS_FAILURE_MESSAGE = ResponseStatus.BUSINESS_FAILURE.getName();
+    private static final String BUSINESS_FAILURE_MESSAGE = ECOResponseStatus.BUSINESS_FAILURE.getName();
 
     @Autowired
     @Qualifier("validationMessageSource")
@@ -69,7 +73,69 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(responseSupport.error(ResponseStatus.SYSTEM_FAILURE, MessageCode.SYSTEM_FAILURE_MESSAGE));
+                .body(responseSupport.error(ECOResponseStatus.SYSTEM_FAILURE, MessageCode.SYSTEM_FAILURE_MESSAGE));
+    }
+
+
+    @ExceptionHandler(NotFoundException.class)
+    protected ResponseEntity<Object> handleNotFound(final NotFoundException exception) {
+
+        String key ="notFound";
+        if(StringUtils.isNotEmpty(exception.getMessage())) {
+            key = exception.getMessage();
+        }
+        String message = messageSource.getMessage(key,null,Locale.getDefault());
+        log.error(message , exception);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(responseSupport.error(ECOResponseStatus.NOT_FOUND, message));
+    }
+
+    /**
+     * process response for BusinessException
+     *
+     * @param exception
+     * @return
+     */
+    @ExceptionHandler(BusinessException.class)
+    protected ResponseEntity<Object> handleBusiness(final BusinessException exception) {
+        log.error(exception.getMessage() ,exception);
+
+        String message = BUSINESS_FAILURE_MESSAGE;
+        ECOResponseStatus errorCode = ECOResponseStatus.BUSINESS_FAILURE;
+        if(StringUtils.isNotEmpty(exception.getMessage())) {
+            message = exception.getMessage();
+        }
+        if(exception.getCode() != null) {
+            errorCode = exception.getCode();
+        }
+        return new ResponseEntity<>(
+                responseSupport.error(errorCode, message),
+                HttpStatus.OK);
+    }
+
+//    @ExceptionHandler(EmplyException.class)
+//    protected ResponseEntity<Object> handleEmply(final EmplyException exception) {
+//        log.error(exception.getMessage() ,exception);
+//
+//        return new ResponseEntity<>(
+//                responseSupport.empty(MessageCode.SYSTEM_FAILURE_MESSAGE),
+//                HttpStatus.OK);
+//    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+            final HttpMediaTypeNotSupportedException exception,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request) {
+        log.error(exception.getMessage() , exception);
+
+        return new ResponseEntity<>(
+                responseSupport.error(ECOResponseStatus.MEDIA_TYPE_FAILURE,
+                        exception.getMessage()),
+                HttpStatus.OK);
+
     }
 
     @Override
@@ -80,8 +146,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(exception.getMessage(), exception);
         return ResponseEntity
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
-                .body(responseSupport.error(ResponseStatus.METHOD_FAILURE, exception.getMessage()));
+                .body(responseSupport.error(ECOResponseStatus.METHOD_FAILURE, exception.getMessage()));
     }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            final HttpMessageNotReadableException exception,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request) {
+        log.error(exception.getMessage() , exception);
+
+        return ResponseEntity.ok( responseSupport.error(ECOResponseStatus.HTTP_MESSAGE_FAILURE,
+                exception.getMessage()));
+
+    }
+
 
     /**
      * handle error validation of the parameter
@@ -103,17 +183,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             final String errorKey = StringUtils.removeEnd(
                     StringUtils.removeStart(violation.getMessageTemplate(), "{"), "}");
 
-            final String errorCode  = getErrorCode(errorKey);
-
             final PartError error = PartError.builder()
-                    .errorCode(errorCode)
-                    .errorItem(fieldError)
-                    .message(messageSource.getMessage(errorKey,
-                            new Object[]{fieldError}, Locale.getDefault()))
-                    .build();
+                                    .errorItem(fieldError)
+                                    .message(messageSource.getMessage(errorKey,
+                                            new Object[]{fieldError}, Locale.getDefault()))
+                                    .build();
             errors.add(error);
         }
-        return ResponseEntity.ok(responseSupport.error(errors));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseSupport.error(errors));
     }
 
     @Override
@@ -122,6 +199,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                          HttpStatus status,
                                                          WebRequest request) {
         log.error(exception.getMessage(), exception);
+        return handleBindingResult(exception, exception.getBindingResult(), headers, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            final MethodArgumentNotValidException exception,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request) {
         return handleBindingResult(exception, exception.getBindingResult(), headers, request);
     }
 
@@ -146,7 +232,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             Class<? extends Object>clazz =bindingResult.getTarget().getClass();
             try {
                 final String itemName = getPropertyShortName(targetWrapper, fieldError.getField());
-                final String code  = getErrorCode(fieldError.getCode());
+//                final String code  = getErrorCode(fieldError.getCode());
 
                 final Field field = clazz.getDeclaredField(fieldError.getField());
                 final FieldName fieldNameAnnotation = field.getAnnotation(FieldName.class);
@@ -155,14 +241,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 if(fieldNameAnnotation != null) {
                     fieldName = fieldNameAnnotation.value();
                 }
+                String message = messageSource.getMessage(
+                        null,
+                        new Object[] {fieldName},
+                        fieldError.getDefaultMessage(),
+                        Locale.getDefault());
                 final PartError error = PartError
                                         .builder()
                                         .errorItem(itemName)
-                                        .errorCode(code)
-                                        .message(messageSource.getMessage(null,
-                                                new Object[] {fieldName},
-                                                fieldError.getDefaultMessage(),
-                                                Locale.getDefault()))
+                                        .message(message)
                                         .build();
                 errors.add(error);
             } catch (NoSuchFieldException e) {
@@ -176,7 +263,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(exception,
                 responseSupport.error(errors),
                 headers,
-                HttpStatus.OK,
+                HttpStatus.BAD_REQUEST,
                 request);
     }
 
@@ -216,7 +303,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 result.add(propertyName.replaceFirst(fullPropertyName, jsonPropertyValue));
             }
         }
-
         return result.toString();
     }
 
@@ -235,6 +321,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             try {
                 clazz = Class.forName("com.hung.common.validation.constraints."+ shortName);
             } catch (ClassNotFoundException e2){
+//                return "9999"; // common code error
                 throw new SystemException(e1.getMessage());
             }
         }
