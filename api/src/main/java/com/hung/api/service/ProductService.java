@@ -6,7 +6,7 @@
  * * Date        : Nov 03, 2020
  * ****************************************************
  **/
-package com.hung.data.service;
+package com.hung.api.service;
 
 import com.hung.data.entity.ProductInfo;
 import org.springframework.data.domain.Page;

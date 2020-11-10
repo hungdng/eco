@@ -6,21 +6,18 @@
  * * Date        : Nov 04, 2020
  * ****************************************************
  **/
-package com.hung.api.contrller;
+package com.hung.api.controller;
 
 import com.hung.api.component.support.ResponseSupport;
 import com.hung.api.dto.request.category.RequestCaregoryCreate;
-import com.hung.api.dto.response.ApiResponse;
-import com.hung.api.dto.response.ResponseData;
 import com.hung.api.dto.response.category.ResponseCategory;
+import com.hung.api.service.CategoryService;
 import com.hung.data.entity.ProductCategory;
 import com.hung.data.enums.MessageCode;
-import com.hung.data.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +27,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/public/categories")
 public class CategoryController {
 
     @Autowired
@@ -50,7 +47,7 @@ public class CategoryController {
         }.getType();
 
         final List<ResponseCategory> categoryList = modelMapper.map(categories, categoryListType);
-        return responseSupport.success(categoryList, MessageCode.SUCCESS_GET_DATA);
+        return ResponseEntity.ok(responseSupport.success(categoryList, MessageCode.SUCCESS_GET_DATA));
     }
 
     @PostMapping

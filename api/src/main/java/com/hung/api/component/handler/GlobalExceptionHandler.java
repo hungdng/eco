@@ -15,6 +15,7 @@ import com.hung.common.annotation.ErrorCode;
 import com.hung.common.annotation.FieldName;
 import com.hung.common.enums.ECOResponseStatus;
 import com.hung.common.exceptions.BusinessException;
+import com.hung.common.exceptions.EmptyException;
 import com.hung.common.exceptions.NotFoundException;
 import com.hung.common.exceptions.SystemException;
 import com.hung.common.utils.StringUtils;
@@ -76,7 +77,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(responseSupport.error(ECOResponseStatus.SYSTEM_FAILURE, MessageCode.SYSTEM_FAILURE_MESSAGE));
     }
 
-
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Object> handleNotFound(final NotFoundException exception) {
 
@@ -109,19 +109,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if(exception.getCode() != null) {
             errorCode = exception.getCode();
         }
-        return new ResponseEntity<>(
-                responseSupport.error(errorCode, message),
-                HttpStatus.OK);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(responseSupport.error(errorCode, message));
     }
 
-//    @ExceptionHandler(EmplyException.class)
-//    protected ResponseEntity<Object> handleEmply(final EmplyException exception) {
-//        log.error(exception.getMessage() ,exception);
-//
-//        return new ResponseEntity<>(
-//                responseSupport.empty(MessageCode.SYSTEM_FAILURE_MESSAGE),
-//                HttpStatus.OK);
-//    }
+    /**
+     * process response for EmptyException
+     *
+     * @param exception EmptyException
+     * @return response object
+     */
+    @ExceptionHandler(EmptyException.class)
+    protected ResponseEntity<Object> handleEmpty(final EmptyException exception) {
+        log.error(exception.getMessage() ,exception);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(responseSupport.empty(MessageCode.SYSTEM_FAILURE_MESSAGE));
+    }
 
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
@@ -159,9 +165,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.ok( responseSupport.error(ECOResponseStatus.HTTP_MESSAGE_FAILURE,
                 exception.getMessage()));
-
     }
-
 
     /**
      * handle error validation of the parameter

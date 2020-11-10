@@ -52,7 +52,7 @@ public class ResponseSupport {
      * @param messageCode
      * @return response object
      */
-    public ResponseEntity<?> success(final Object data , final MessageCode messageCode){
+    public ApiResponse<?> success(final Object data , final MessageCode messageCode){
         return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, data);
     }
 
@@ -62,7 +62,7 @@ public class ResponseSupport {
      * @param messageCode messageCode
      * @return response object
      */
-    public ResponseEntity<?> success(final MessageCode messageCode){
+    public ApiResponse<?> success(final MessageCode messageCode){
         return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, null);
     }
 
@@ -72,7 +72,7 @@ public class ResponseSupport {
      * @param messageCode messageCode of response
      * @return response object
      */
-    public ResponseEntity<?> empty(final MessageCode messageCode){
+    public ApiResponse<?> empty(final MessageCode messageCode){
         return fetchNormal(ECOResponseStatus.SUCCESS, messageCode, null);
     }
 
@@ -83,11 +83,9 @@ public class ResponseSupport {
      * @param messageCode messageCode of response
      * @return response object
      */
-    public ResponseEntity<?> error(final ECOResponseStatus statusCode, final MessageCode messageCode){
+    public ApiResponse<?> error(final ECOResponseStatus statusCode, final MessageCode messageCode){
         String message = messageSource.getMessage(messageCode.getValue(),null, Locale.getDefault());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response(statusCode, message, null, null));
+        return response(statusCode, message, null, null);
     }
 
     /**
@@ -139,11 +137,11 @@ public class ResponseSupport {
      * @param data response data
      * @return response object
      */
-    public ResponseEntity<?> fetchNormal(final ECOResponseStatus code,
+    public ApiResponse<?> fetchNormal(final ECOResponseStatus code,
                                       final MessageCode messageCode,
                                       final Object data){
         String message = messageSource.getMessage(messageCode.getValue(), null, Locale.getDefault());
-        return ResponseEntity.ok(response(code,message,data,null));
+        return response(code,message,data,null);
     }
 
     /**
