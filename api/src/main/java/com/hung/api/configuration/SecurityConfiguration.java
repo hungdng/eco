@@ -9,6 +9,7 @@
 package com.hung.api.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hung.api.filter.TokenAuthenticationFilter;
 import com.hung.common.configuration.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -80,5 +81,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated().and()
 //                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
+
+    public TokenAuthenticationFilter tokenAuthenticationFilter() throws Exception{
+        final
     }
 }
