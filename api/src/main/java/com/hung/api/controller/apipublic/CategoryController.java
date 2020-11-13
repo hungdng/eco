@@ -6,7 +6,7 @@
  * * Date        : Nov 04, 2020
  * ****************************************************
  **/
-package com.hung.api.controller;
+package com.hung.api.controller.apipublic;
 
 import com.hung.api.component.support.ResponseSupport;
 import com.hung.api.dto.request.category.RequestCaregoryCreate;

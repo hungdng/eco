@@ -57,4 +57,5 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
         SecurityContextHolder.setContext(context);
         chain.doFilter(request, response);
     }
+
 }
